@@ -1,0 +1,57 @@
+name: Build firmware
+
+on:
+  push:
+    tags:        
+      - '*'
+
+env:
+  PROJECT_NAME: my-project
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential 
+
+    - name: Install Pico SDK
+      run: |
+        git clone -b master https://github.com/raspberrypi/pico-sdk.git
+        cd pico-sdk
+        git submodule update --init
+        pwd > /tmp/pico_sdk.txt
+        cd ..
+
+    - name: Configure CMake
+      run: |
+        mkdir -p firmware/build
+        cd firmware/build
+        export PICO_SDK_PATH=`cat /tmp/pico_sdk.txt`
+        cmake -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} ..
+
+    - name: Build
+      run: |
+        cd firmware/build
+        export PICO_SDK_PATH=`cat /tmp/pico_sdk.txt`
+        make
+
+    - name: Prepare package
+      run:
+        zip -j ${{env.PROJECT_NAME}}-${{ github.ref_name }}.zip firmware/build/${{env.PROJECT_NAME}}.elf firmware/build/${{env.PROJECT_NAME}}.uf2 firmware/build/${{env.PROJECT_NAME}}.bin
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{env.PROJECT_NAME}}-${{ github.ref_name }}.zip
+        asset_name: ${{env.PROJECT_NAME}}-${{ github.ref_name }}.zip
+        tag: ${{ github.ref }}
+        overwrite: true
