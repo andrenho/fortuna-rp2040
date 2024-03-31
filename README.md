@@ -1,24 +1,24 @@
-# Pico C template
-A template for new Raspberry Pi Pico projects using the [Pico C SDK](https://www.raspberrypi.com/documentation/pico-sdk/).
+# fortuna-rp2040
+A home-made computer based on the RP2040 CPU (Raspberry Pi Pico)
 
-![image](https://github.com/andrenho/pico-c-template/assets/84652/1c3bae06-df87-4822-a9f1-7df25fbfd2d7)
+## Ideas
+- OS / user code runs of 1st CPU
+- Memory: internal RAM (fast RAM) + external RAM (slow RAM)
+  - Code can run from both RAMs + flash
+  - External RAM used to store other apps state
+  - https://kevinboone.me/pico_run_ram.html
+- Video
+  - Custom generation of VGA
+  - 2nd CPU + PIO used to generate video (see https://geoffg.net/picomitevga.html)
+- Flash in Raspberry Pi Pico used for
+  - BIOS (1st CPU) + copy of current OS (?)
+    - OS code checked with checksum on initialization
+  - Video code (2nd CPU)
+- SDCard
+- HID for keyboard (+ mouse?)
 
-# Features
-- A skeleton CMake project containing some usefult targets
-- A skeleton [Kicad](https://www.kicad.org/) template for the circuit (including a Pi Pico symbol).
-- Build the firmware locally and install it remotely (for example, use a PC to edit and compile the firmware, and a Raspberry Pi to upload it via SWD)
-- Create a new git tag, and github will build and release the firmware in the main project page.
-
-# Included targets
-- `make`: the base target also prints the firmware size after building it
-- `make upload-usb`: upload firmware using the PC USB port (requires restarting the Pico with BOOTSEL)
-- `make upload-swd`: upload firmware using SWD pins on a Raspberry Pi (doesn't require rebooting the Pico)
-- `make upload-remote`: building locally and send the file to a remote Raspberry Pi. It the remote Raspberry Pi is running `tools/upload_server.py`, it'll receive the firmware file and upload it to the Pico using SWD. Requires setting the environment variable `$REMOTE_IP` on the client.
-- `make talk`: open a serial terminal to talk to the Pi. Requires `screen` installed.
-
-# Starting out
-- Change the project name in these two files:
-  - `firmware/CMakeLists.txt`
-  - `.github/workflows/build-firmware.yml`
-- Write your project as usual
-- When ready to release, create a version tag (ex.: `v1.0.0`). This will fire a Github Action that will build the firmware into a release package, and create a release in the main page.
+## Tests
+- Blink in assembly
+- Blink in RAM
+- Copy blink to RAM and run it
+- Copy blink in C to RAM and run it
