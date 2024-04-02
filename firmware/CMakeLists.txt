@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.13)
 
 include(pico_sdk_import.cmake)
 
-project(my-project C CXX ASM)
+project(fortuna-rp2040 C CXX ASM)
+set(BIOS_VERSION 0.0.1)
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
@@ -10,6 +12,7 @@ pico_sdk_init()
 add_executable(${CMAKE_PROJECT_NAME}
 		src/main.c
 )
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE BIOS_VERSION="${BIOS_VERSION}")
 
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
 		POST_BUILD
@@ -45,4 +48,4 @@ add_custom_target(talk
 pico_enable_stdio_usb(${CMAKE_PROJECT_NAME} 1)
 pico_add_extra_outputs(${CMAKE_PROJECT_NAME})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib)
+target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib hardware_flash)

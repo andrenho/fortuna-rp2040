@@ -17,6 +17,12 @@ A home-made computer based on the RP2040 CPU (Raspberry Pi Pico)
 - SDCard
 - HID for keyboard (+ mouse?)
 
+### Bootstrap process
+1. System boot into BIOS (first half of the flash)
+2. OS is loaded from the SD card and placed into BIOS (if not already there, based on checksum)
+3. OS loads the SHELL into RAM
+4. Other applications can be loaded from SHELL
+
 ## Tests
 - Blink in assembly
 - Blink in RAM

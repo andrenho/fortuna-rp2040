@@ -1,0 +1,77 @@
+Flash: 0x10000000 to 0x10200000
+RAM:   0x20000000 to 0x20042000
+
+Memory layout: https://community.element14.com/cfs-file/__key/communityserver-blogs-components-weblogfiles/00-00-00-00-86/pastedimage1693423261167v1.png
+
+return 42:
+    movs    r0, #42     ; 2a 20
+    bx      lr          ; 70 47
+
+-----------------------------------------------------------------------------------------
+
+Run custom code in RAM and in Flash:
+
+```c
+#include <hardware/flash.h>
+
+#define FLASH_TARGET_OFFSET (256 * 1024)
+const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGET_OFFSET);
+
+int main()
+{
+    stdio_usb_init();
+
+    getchar();
+
+    // put binary in some random position
+    /*
+    movs    r0, #43     ; 2b 20
+    bx      lr          ; 70 47
+    */
+    uint8_t p[FLASH_PAGE_SIZE] = { 0x2b, 0x20, 0x70, 0x47 };
+
+    typedef int (*Function)();
+    Function test = (Function) (((uintptr_t) p) | 1);
+    printf("RAM function address: %p\n", test);
+
+    int value = test();
+    printf("%d\n", value);
+
+    sleep_ms(50);
+    flash_range_erase(FLASH_TARGET_OFFSET, FLASH_SECTOR_SIZE);
+    flash_range_program(FLASH_TARGET_OFFSET, p, FLASH_PAGE_SIZE);
+
+    Function test2 = (Function) (((uintptr_t) flash_target_contents) | 1);
+    printf("ROM function address: %p\n", test2);
+    int value2 = test2();
+    printf("%d\n", value2);
+
+    for (;;);
+}
+```
+
+Compiling executable for running in Pico (.text in 0x1000):
+
+```sh
+arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -nostdlib -nostartfiles -ffreestanding -o os.o -c os.c
+arm-none-eabi-ld -Trom.ld os.o -o osx.elf
+arm-none-eabi-objcopy --remove-section=.comment --remove-section=.note --remove-section=.debug* osx.elf os.elf
+rm os.o osx.elf
+arm-none-eabi-readelf -l os.elf
+```
+
+rom.ld:
+
+```ld
+SECTIONS
+{
+.text : ALIGN(0x04) { *.o(.text .rodata .data) }
+.bss :
+  {
+  __bss_start__ = .;
+  *(.bss*)
+  *(COMMON)
+  __bss_end__ = .;
+  }
+}
+```

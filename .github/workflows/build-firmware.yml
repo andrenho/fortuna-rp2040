@@ -6,7 +6,7 @@ on:
       - '*'
 
 env:
-  PROJECT_NAME: my-project
+  PROJECT_NAME: fortuna-rp2040
   BUILD_TYPE: Release
 
 jobs:
