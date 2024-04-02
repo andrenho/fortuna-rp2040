@@ -11,6 +11,8 @@ pico_sdk_init()
 
 add_executable(${CMAKE_PROJECT_NAME}
 		src/main.c
+		src/sdcard.c
+		src/sdcard.h
 )
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE BIOS_VERSION="${BIOS_VERSION}")
 
@@ -48,4 +50,4 @@ add_custom_target(talk
 pico_enable_stdio_usb(${CMAKE_PROJECT_NAME} 1)
 pico_add_extra_outputs(${CMAKE_PROJECT_NAME})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib hardware_flash)
+target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib hardware_flash hardware_spi)
