@@ -13,10 +13,11 @@ add_executable(${CMAKE_PROJECT_NAME}
 		src/main.c
 		src/statusled.c
 		src/statusled.h
+		src/hw_config.c
 )
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE BIOS_VERSION="${BIOS_VERSION}")
 
-add_subdirectory(contrib/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src/
+add_subdirectory(contrib/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src build)
 
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
 		POST_BUILD
@@ -52,4 +53,4 @@ add_custom_target(talk
 pico_enable_stdio_usb(${CMAKE_PROJECT_NAME} 1)
 pico_add_extra_outputs(${CMAKE_PROJECT_NAME})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib hardware_flash hardware_spi)
+target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib hardware_flash no-OS-FatFS-SD-SDIO-SPI-RPi-Pico)
