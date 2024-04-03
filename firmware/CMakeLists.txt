@@ -11,10 +11,12 @@ pico_sdk_init()
 
 add_executable(${CMAKE_PROJECT_NAME}
 		src/main.c
-		src/sdcard.c
-		src/sdcard.h
+		src/statusled.c
+		src/statusled.h
 )
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE BIOS_VERSION="${BIOS_VERSION}")
+
+add_subdirectory(contrib/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src/
 
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
 		POST_BUILD
